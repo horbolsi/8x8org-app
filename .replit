@@ -1,0 +1,14 @@
+modules = ["nodejs-20", "python-3.11"]
+[agent]
+expertMode = true
+
+[nix]
+packages = ["gh", "coreutils-prefixed", "openssh", "nano"]
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
+localPort = 3006
+externalPort = 80

@@ -1,0 +1,57 @@
+=== BOT SYSTEM DEBUG INFORMATION ===
+Generated: Wed Jan  7 10:49:07 PM UTC 2026
+
+1. SYSTEM INFO:
+   Node: v20.19.3
+   NPM: 10.8.2
+   OS: Linux dbc7c50dbe36 6.14.11 #1-NixOS SMP PREEMPT_DYNAMIC Tue Jan  1 00:00:00 UTC 1980 x86_64 GNU/Linux
+   PWD: /home/runner/workspace
+
+2. ENVIRONMENT VARIABLES (safe):
+   DATABASE_URL=postgresql://postgres:password@helium/heliumdb?sslmode=disable
+   app8x8org_BOT_TOKEN=8483****4BJo
+   TELEGRAM_BOT_TOKEN=8560****lko8
+   SESSION_SECRET=B3VQ****FQ==
+   CLICKUP_API_TOKEN=pk_1****GAZW
+   PGDATABASE=heliumdb
+   REPL_IDENTITY_KEY=k2.s****EiiA
+   REPL_PUBKEYS={"cr****E="}
+
+3. DIRECTORY STRUCTURE:
+./bots/airdrop_bot/index.js
+./bots/airdrop_bot.js
+./bots_backup_20260107_203934/airdrop_bot/index.js
+./bots_backup_20260107_203934/airdrop_bot.js
+./bots_backup_20260107_203934/in_bot/index.js
+./bots_backup_20260107_203934/in_bot.js
+./bots_backup_20260107_203934/main_bot/index.js
+./bots_backup_20260107_203934/main_bot.js
+./bots_backup_20260107_203934/out_bot/index.js
+./bots_backup_20260107_203934/out_bot.js
+./bots_backup_20260107_204242/airdrop_bot/index.js
+./bots_backup_20260107_204242/airdrop_bot.js
+./bots_backup_20260107_204242/in_bot/index.js
+./bots_backup_20260107_204242/in_bot.js
+./bots_backup_20260107_204242/main_bot/index.js
+./bots_backup_20260107_204242/main_bot.js
+./bots_backup_20260107_204242/out_bot/index.js
+./bots_backup_20260107_204242/out_bot.js
+./bots_backup_20260107_204651/airdrop_bot/index.js
+./bots_backup_20260107_204651/airdrop_bot.js
+
+4. RUNNING PROCESSES:
+runner     16396  0.0  0.0 930628 47080 pts/5    Sl+  22:34   0:00 /nix/store/lz7iav1hd92jbv44zf2rdd7b2mj23536-nodejs-20.19.3/bin/node start_bots_safe.js
+runner     16403  0.0  0.0 732484 45852 pts/5    Sl+  22:34   0:00 /nix/store/lz7iav1hd92jbv44zf2rdd7b2mj23536-nodejs-20.19.3/bin/node bots/main_bot/index.js
+runner     16430  0.0  0.0 732740 45936 pts/5    Sl+  22:35   0:00 /nix/store/lz7iav1hd92jbv44zf2rdd7b2mj23536-nodejs-20.19.3/bin/node bots/airdrop_bot/index.js
+runner     16437  0.0  0.0 732740 45936 pts/5    Sl+  22:35   0:00 /nix/store/lz7iav1hd92jbv44zf2rdd7b2mj23536-nodejs-20.19.3/bin/node bots/in_bot/index.js
+runner     16444  0.0  0.0 1005436 63568 pts/5   Sl+  22:35   0:00 /nix/store/lz7iav1hd92jbv44zf2rdd7b2mj23536-nodejs-20.19.3/bin/node bots/out_bot/index.js
+
+5. NPM PACKAGES:
+├── axios@1.13.2
+├── dotenv@16.6.1
+├── node-telegram-bot-api@0.67.0
+├── sequelize@6.37.7
+├── telegraf@4.16.3
+└── winston@3.19.0
+
+=== END OF DEBUG INFO ===

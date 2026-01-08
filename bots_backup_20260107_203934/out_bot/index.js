@@ -1,0 +1,300 @@
+const TelegramBot = require('node-telegram-bot-api');
+const { Task, User, UserTask } = require('../../database/models');
+const logger = require('../../utils/logger');
+
+class OutBot {
+    constructor() {
+        this.token = process.env.OUT_BOT_TOKEN || process.env.APP_BOT_TOKEN;
+        if (!this.token) {
+            logger.warn('OUT_BOT_TOKEN not set, using APP_BOT_TOKEN');
+        }
+        
+        this.bot = new TelegramBot(this.token, { polling: true });
+        this.botName = 'OUT';
+        this.initialize();
+    }
+
+    async initialize() {
+        logger.botEvent(this.botName, 'Initializing...');
+        
+        try {
+            await this.setupCommands();
+            await this.setupListeners();
+            
+            const me = await this.bot.getMe();
+            logger.botEvent(this.botName, `Connected as @${me.username}`);
+            
+        } catch (error) {
+            logger.error(`Failed to initialize ${this.botName} bot:`, error);
+            throw error;
+        }
+    }
+
+    async setupCommands() {
+        logger.botEvent(this.botName, 'Setting up commands...');
+        
+        // ========== COMMAND: /start ==========
+        this.bot.onText(/\/start/, async (msg) => {
+            const chatId = msg.chat.id;
+            
+            const welcomeMessage = `
+📤 *Welcome to OUT Bot!*
+
+This bot handles task distribution and tracking.
+
+*Available Commands:*
+/tasks - View OUT tasks
+/task_[id] - Start an OUT task
+/my_tasks - Your OUT tasks
+/progress - Your progress
+/help - Show help
+
+*Note:* You need to be registered with the main bot first.
+            `.trim();
+            
+            await this.bot.sendMessage(chatId, welcomeMessage, { parse_mode: 'Markdown' });
+        });
+
+        // ========== COMMAND: /tasks ==========
+        this.bot.onText(/\/tasks/, async (msg) => {
+            const chatId = msg.chat.id;
+            const userId = msg.from.id;
+            
+            logger.userAction(userId, 'OUT bot /tasks');
+            
+            try {
+                const user = await User.findOne({ where: { telegram_id: userId } });
+                if (!user) {
+                    return await this.bot.sendMessage(chatId,
+                        '❌ *Please register first*\n\n' +
+                        'Use /start in @xorgbytm8_bot',
+                        { parse_mode: 'Markdown' }
+                    );
+                }
+                
+                const tasks = await Task.findAll({
+                    where: {
+                        bot_type: 'OUT',
+                        is_active: true
+                    },
+                    order: [['created_at', 'DESC']],
+                    limit: 10
+                });
+                
+                if (tasks.length === 0) {
+                    return await this.bot.sendMessage(chatId,
+                        '📭 *No OUT tasks available*\n\n' +
+                        'Check back later!',
+                        { parse_mode: 'Markdown' }
+                    );
+                }
+                
+                let message = `📤 *Available OUT Tasks*\n\n`;
+                
+                tasks.forEach((task, index) => {
+                    message += `*${index + 1}. ${task.title}*\n`;
+                    message += `📝 ${task.description?.substring(0, 50) || ''}...\n`;
+                    message += `🏆 *Points:* ${task.points_reward}\n`;
+                    message += `🔢 *Command:* /task_${task.id}\n\n`;
+                });
+                
+                await this.bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+                
+            } catch (error) {
+                logger.error('OUT tasks error:', error);
+                await this.bot.sendMessage(chatId,
+                    '❌ *Error loading tasks*',
+                    { parse_mode: 'Markdown' }
+                );
+            }
+        });
+
+        // ========== COMMAND: /task_[id] ==========
+        this.bot.onText(/\/task_(\d+)/, async (msg, match) => {
+            const chatId = msg.chat.id;
+            const userId = msg.from.id;
+            const taskId = match[1];
+            
+            logger.userAction(userId, `OUT bot /task_${taskId}`);
+            
+            try {
+                const user = await User.findOne({ where: { telegram_id: userId } });
+                if (!user) return;
+                
+                const task = await Task.findOne({
+                    where: {
+                        id: taskId,
+                        bot_type: 'OUT',
+                        is_active: true
+                    }
+                });
+                
+                if (!task) {
+                    return await this.bot.sendMessage(chatId,
+                        '❌ *Task not found*',
+                        { parse_mode: 'Markdown' }
+                    );
+                }
+                
+                // Create user task
+                await UserTask.create({
+                    user_id: user.id,
+                    task_id: task.id,
+                    status: 'in_progress'
+                });
+                
+                await this.bot.sendMessage(chatId,
+                    `📤 *OUT Task Started*\n\n` +
+                    `*Title:* ${task.title}\n` +
+                    `*Description:* ${task.description || 'No description'}\n` +
+                    `*Points:* ${task.points_reward}\n\n` +
+                    `Use /submit_${task.id} when complete.`,
+                    { parse_mode: 'Markdown' }
+                );
+                
+                logger.taskEvent(task.id, user.id, 'OUT task started');
+                
+            } catch (error) {
+                logger.error('OUT task start error:', error);
+                await this.bot.sendMessage(chatId,
+                    '❌ *Error starting task*',
+                    { parse_mode: 'Markdown' }
+                );
+            }
+        });
+
+        // ========== COMMAND: /submit_[id] ==========
+        this.bot.onText(/\/submit_(\d+)/, async (msg, match) => {
+            const chatId = msg.chat.id;
+            const userId = msg.from.id;
+            const taskId = match[1];
+            
+            logger.userAction(userId, `OUT bot /submit_${taskId}`);
+            
+            try {
+                const user = await User.findOne({ where: { telegram_id: userId } });
+                if (!user) return;
+                
+                const userTask = await UserTask.findOne({
+                    where: {
+                        user_id: user.id,
+                        task_id: taskId,
+                        status: 'in_progress'
+                    }
+                });
+                
+                if (!userTask) {
+                    return await this.bot.sendMessage(chatId,
+                        '❌ *No active task found*',
+                        { parse_mode: 'Markdown' }
+                    );
+                }
+                
+                const task = await Task.findByPk(taskId);
+                
+                // Mark as completed
+                userTask.status = 'completed';
+                userTask.completed_at = new Date();
+                userTask.score_earned = task.points_reward;
+                await userTask.save();
+                
+                // Update user
+                user.score += task.points_reward;
+                user.tasks_completed += 1;
+                await user.save();
+                
+                await this.bot.sendMessage(chatId,
+                    `✅ *OUT Task Completed!*\n\n` +
+                    `*Task:* ${task.title}\n` +
+                    `*Points earned:* +${task.points_reward}\n` +
+                    `*Total:* ${user.score} points\n\n` +
+                    `Great work!`,
+                    { parse_mode: 'Markdown' }
+                );
+                
+                logger.taskEvent(task.id, user.id, 'OUT task completed', {
+                    points_earned: task.points_reward
+                });
+                
+            } catch (error) {
+                logger.error('OUT submit error:', error);
+                await this.bot.sendMessage(chatId,
+                    '❌ *Error submitting task*',
+                    { parse_mode: 'Markdown' }
+                );
+            }
+        });
+
+        // ========== COMMAND: /help ==========
+        this.bot.onText(/\/help/, async (msg) => {
+            const chatId = msg.chat.id;
+            
+            const helpMessage = `
+🤖 *OUT Bot Commands*
+
+*📤 Task Commands:*
+/tasks - List OUT tasks
+/task_[id] - Start OUT task
+/submit_[id] - Submit response
+/my_tasks - Your tasks
+
+*📊 Information:*
+/progress - Your progress
+/score - Your score
+/help - This message
+
+*🔗 Requirements:*
+Must be registered with main bot
+Points contribute to overall score
+
+*🆘 Need help?* Contact admin.
+            `.trim();
+            
+            await this.bot.sendMessage(chatId, helpMessage, { parse_mode: 'Markdown' });
+        });
+
+        logger.botEvent(this.botName, 'Commands setup complete');
+        
+    } catch (error) {
+        logger.error('Failed to setup OUT bot commands:', error);
+        throw error;
+    }
+}
+
+    async setupListeners() {
+        this.bot.on('error', (error) => {
+            logger.error('OUT bot error:', error);
+        });
+        
+        logger.botEvent(this.botName, 'Listeners setup complete');
+    }
+
+    async stop() {
+        try {
+            this.bot.stopPolling();
+            logger.botEvent(this.botName, 'Stopped polling');
+        } catch (error) {
+            logger.error('Error stopping OUT bot:', error);
+        }
+    }
+}
+
+async function startOutBot() {
+    try {
+        const bot = new OutBot();
+        logger.botEvent('OUT', 'Bot instance created');
+        return bot;
+    } catch (error) {
+        logger.error('Failed to start OUT bot:', error);
+        if (error.message.includes('token')) {
+            logger.warn('OUT bot not started (token not configured)');
+            return null;
+        }
+        throw error;
+    }
+}
+
+module.exports = {
+    OutBot,
+    startOutBot
+};

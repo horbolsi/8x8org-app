@@ -1,0 +1,16 @@
+{
+  "name": "out-bot",
+  "version": "1.0.0",
+  "description": "OUT Bot for task distribution",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.64.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

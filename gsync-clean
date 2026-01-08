@@ -1,0 +1,29 @@
+#!/bin/bash
+echo "🔄 Syncing 8x8org to GitHub..."
+cd /home/runner/workspace
+
+# Check for token
+if [ -z "$GITHUB_TOKEN" ]; then
+    echo "❌ GITHUB_TOKEN environment variable not set"
+    echo "Set it with: export GITHUB_TOKEN=your_token"
+    echo "Or enter your token:"
+    read -s GITHUB_TOKEN
+    echo ""
+fi
+
+if [ -z "$GITHUB_TOKEN" ]; then
+    echo "❌ Token required"
+    exit 1
+fi
+
+# Git operations
+git add .
+git commit -m "Update: $(date '+%Y-%m-%d %H:%M:%S')" 2>/dev/null || echo "No changes to commit"
+
+# Push using token from environment
+if git push https://horbolsi:$GITHUB_TOKEN@github.com/horbolsi/8x8org-app.git main; then
+    echo "✅ Successfully synced to GitHub!"
+    echo "📊 View at: https://github.com/horbolsi/8x8org-app"
+else
+    echo "❌ Sync failed"
+fi

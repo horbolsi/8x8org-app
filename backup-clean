@@ -1,0 +1,17 @@
+#!/bin/bash
+cd ~/workspace
+
+# Get token from environment or prompt
+if [ -z "$GITHUB_TOKEN" ]; then
+    if [ -f ~/.github_token ]; then
+        GITHUB_TOKEN=$(cat ~/.github_token)
+    else
+        read -sp "GitHub token: " GITHUB_TOKEN
+        echo ""
+    fi
+fi
+
+# Quick backup
+git add . 2>/dev/null
+git commit -m "backup: $(date '+%H:%M')" 2>/dev/null
+git push https://horbolsi:$GITHUB_TOKEN@github.com/horbolsi/8x8org-app.git main 2>/dev/null && echo "✅ Backed up"

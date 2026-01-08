@@ -1,0 +1,10 @@
+#!/bin/bash
+# Safe sync - uses environment variable
+if [ -z "$GITHUB_TOKEN" ]; then
+    echo "Set GITHUB_TOKEN first: export GITHUB_TOKEN=your_token"
+    exit 1
+fi
+cd /home/runner/workspace
+git add .
+git commit -m "Update: $(date)" 2>/dev/null || echo "No changes"
+git push https://horbolsi:$GITHUB_TOKEN@github.com/horbolsi/8x8org-telegram-ecosystem.git main

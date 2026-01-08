@@ -1,0 +1,34 @@
+{
+  "name": "multi-bot-system",
+  "version": "1.0.0",
+  "description": "Multiple bots with wallet and NFT features",
+  "main": "start_bots_safe.js",
+  "scripts": {
+    "start": "node start_bots_safe.js",
+    "start:test": "node start_bots_safe.js --test",
+    "start:wallet": "node start_bots_safe.js --wallet-only",
+    "start:nft": "node start_bots_safe.js --nft-only",
+    "test": "node test_system.js",
+    "wallet": "node bots/wallet_bot/index.js",
+    "nft": "node bots/nft_marketplace/index.js",
+    "main": "node bots/main_bot/index.js",
+    "airdrop": "node bots/airdrop_bot/index.js",
+    "in": "node bots/in_bot/index.js",
+    "out": "node bots/out_bot/index.js",
+    "dev": "nodemon start_bots_safe.js"
+  },
+  "dependencies": {
+    "axios": "^1.13.2",
+    "chalk": "^5.6.2",
+    "dotenv": "^16.6.1",
+    "ethers": "^6.8.0",
+    "mysql2": "^3.16.0",
+    "node-telegram-bot-api": "^0.67.0",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.7",
+    "sqlite3": "^5.1.7",
+    "telegraf": "^4.16.3",
+    "winston": "^3.19.0"
+  }
+}

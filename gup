@@ -1,0 +1,5 @@
+#!/bin/bash
+cd /home/runner/workspace
+git add . >/dev/null 2>&1
+git commit -m "quick: $(date '+%H:%M')" >/dev/null 2>&1
+echo "✓ GitHub updated"

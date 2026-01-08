@@ -1,0 +1,11 @@
+#!/bin/bash
+echo "📊 8x8org Git Status"
+echo "==================="
+cd /home/runner/workspace
+echo "Changes:"
+git status --short
+echo ""
+echo "Recent commits:"
+git log --oneline -3
+echo ""
+echo "🔗 GitHub: https://github.com/horbolsi/8x8org-app"

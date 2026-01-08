@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workspace Architecture Report</title>
+    <style>
+        body { font-family: monospace; margin: 20px; background: #f5f5f5; }
+        pre { background: white; padding: 15px; border-radius: 5px; border: 1px solid #ddd; overflow-x: auto; }
+        h2 { color: #333; border-bottom: 2px solid #666; padding-bottom: 5px; }
+        .timestamp { color: #666; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <h1>Workspace Architecture Report</h1>
+    <div class="timestamp">Generated: $(date)</div>
+    
+    <h2>System Information</h2>
+    <pre>$(node --version && echo "NPM: $(npm --version)" && echo "Directory: $(pwd)")</pre>
+    
+    <h2>File Structure</h2>
+    <pre>$(find . -type f -name "*.js" -o -name "*.json" -o -name "*.sh" -o -name "*.md" | sort)</pre>
+    
+    <h2>Package.json</h2>
+    <pre>$(cat package.json 2>/dev/null || echo "No package.json found")</pre>
+    
+    <h2>start_bots_safe.js</h2>
+    <pre>$(cat start_bots_safe.js 2>/dev/null || echo "File not found")</pre>
+    
+    <h2>manage_ecosystem.sh</h2>
+    <pre>$(cat manage_ecosystem.sh 2>/dev/null || echo "File not found")</pre>
+</body>
+</html>

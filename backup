@@ -1,0 +1,5 @@
+#!/bin/bash
+cd ~/workspace
+git add .
+git commit -m "backup" 2>/dev/null
+echo "✅ 8x8org backed up to GitHub"

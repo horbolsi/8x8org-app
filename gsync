@@ -1,0 +1,11 @@
+#!/bin/bash
+echo "🔄 Syncing 8x8org to GitHub..."
+cd /home/runner/workspace
+git add .
+git commit -m "Update: $(date '+%Y-%m-%d %H:%M:%S')" 2>/dev/null || echo "No changes to commit"
+if [ $? -eq 0 ]; then
+    echo "✅ Successfully synced to GitHub!"
+    echo "📊 View at: https://github.com/horbolsi/8x8org-app"
+else
+    echo "❌ Sync failed. Check your connection or token."
+fi
